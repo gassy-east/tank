@@ -62,7 +62,7 @@ canvas {
 .stick-zone {
   position: absolute;
   bottom: 0;
-  width: 50%;
+  width: 40%;
   height: 200px;
   pointer-events: auto;
   -webkit-tap-highlight-color: transparent;
@@ -94,25 +94,47 @@ canvas {
   transition: opacity 0.1s;
 }
 
-/* ── Mine button ── */
-#btn-mine {
-  position: absolute;
-  bottom: 165px;
-  right: 50%;
-  transform: translateX(50%);
-  width: 52px; height: 52px;
+/* ── Center controls (fire + mine) ── */
+#center-controls {
+  position: fixed;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  z-index: 6;
+  pointer-events: none;
+}
+#btn-fire {
+  width: 72px; height: 72px;
   border-radius: 50%;
-  background: rgba(255,100,0,0.25);
-  border: 2px solid rgba(255,100,0,0.6);
-  color: #FF6600;
+  background: rgba(0,200,255,0.2);
+  border: 2px solid rgba(0,200,255,0.7);
+  color: #00CFFF;
   font-size: 13px;
   font-weight: bold;
   display: flex; align-items: center; justify-content: center;
   pointer-events: auto;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  z-index: 6;
 }
+#btn-fire:active { background: rgba(0,200,255,0.45); }
+#btn-mine {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  background: rgba(255,100,0,0.2);
+  border: 2px solid rgba(255,100,0,0.6);
+  color: #FF6600;
+  font-size: 12px;
+  font-weight: bold;
+  display: flex; align-items: center; justify-content: center;
+  pointer-events: auto;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+#btn-mine:active { background: rgba(255,100,0,0.45); }
 </style>
 </head>
 <body>
@@ -129,11 +151,14 @@ canvas {
     </div>
   </div>
   <div id="stick-right" class="stick-zone">
-    <div id="btn-mine">地雷</div>
     <div id="base-right" class="stick-base">
       <div id="knob-right" class="stick-knob"></div>
     </div>
   </div>
+</div>
+<div id="center-controls">
+  <div id="btn-mine">地雷</div>
+  <div id="btn-fire">発射</div>
 </div>
 
 <script>
@@ -177,16 +202,18 @@ const lerp = (a,b,t) => a+(b-a)*t;
 const Touch = {
   left:  { active:false, vx:0, vy:0, id:null },
   right: { active:false, angle:0, moving:false, id:null },
+  fire: false,
   mineTap: false,
   titleTap: false,
   pauseTap: false,
-  _scale: 1,   // canvas CSS scale for coordinate mapping
+  _scale: 1,
 
   // called each frame end to reset one-shot flags
   flush(){
     this.mineTap = false;
     this.titleTap = false;
     this.pauseTap = false;
+    // fire is held state — not reset here
   },
 
   initStick(side, zoneEl, knobEl, baseEl){
@@ -600,8 +627,8 @@ class PlayerTank extends Tank {
 
     if(this.sCool>0) this.sCool--;
 
-    // auto-shoot while right stick is actively pushed
-    if(Touch.right.active && Touch.right.moving && this.sCool===0){
+    // shoot while fire button is held
+    if(Touch.fire && this.sCool===0){
       if(this.shoot()) this.sCool=8;
     }
 
@@ -951,6 +978,15 @@ const G = {
       if(this.state===ST.PLAY)   this.state=ST.PAUSE;
       else if(this.state===ST.PAUSE) this.state=ST.PLAY;
     }, {passive:false});
+
+    // fire button (held = continuous shoot)
+    const btnFire = document.getElementById('btn-fire');
+    btnFire.addEventListener('touchstart', e=>{
+      e.preventDefault(); Sfx.resume();
+      Touch.fire=true;
+    }, {passive:false});
+    btnFire.addEventListener('touchend',   e=>{ e.preventDefault(); Touch.fire=false; }, {passive:false});
+    btnFire.addEventListener('touchcancel',e=>{ e.preventDefault(); Touch.fire=false; }, {passive:false});
 
     // mine button
     document.getElementById('btn-mine').addEventListener('touchstart', e=>{
