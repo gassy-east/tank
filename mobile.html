@@ -135,6 +135,28 @@ canvas {
   -webkit-tap-highlight-color: transparent;
 }
 #btn-mine:active { background: rgba(255,100,0,0.45); }
+
+/* ── Landscape: right-side grouping ── */
+@media (orientation: landscape) {
+  #sticks { height: 155px; }
+  .stick-zone { height: 155px; }
+
+  /* shrink left zone slightly */
+  #stick-left { width: 36%; }
+
+  /* right zone stays 40% but aim base shifts left to leave room for buttons */
+  #stick-right { width: 40%; }
+  #base-right  { left: 38%; }   /* shift base leftward; transform stays -50% */
+
+  /* move center controls from center to far-right */
+  #center-controls {
+    left: auto;
+    transform: none;
+    right: 14px;
+    bottom: 12px;
+    gap: 10px;
+  }
+}
 </style>
 </head>
 <body>
@@ -635,8 +657,44 @@ class PlayerTank extends Tank {
     // mine button
     if(Touch.mineTap) this.layMine();
   }
+  drawGuide(ctx){
+    if(this.dead || !G.field) return;
+    const field = G.field;
+    let x = this.x + Math.cos(this.tAngle)*(TANK_SZ/2+BULLET_R+2);
+    let y = this.y + Math.sin(this.tAngle)*(TANK_SZ/2+BULLET_R+2);
+    let vx = Math.cos(this.tAngle)*BULLET_SPD;
+    let vy = Math.sin(this.tAngle)*BULLET_SPD;
+    let bounces = this.maxBnc;
+    ctx.save();
+    ctx.strokeStyle='rgba(0,207,255,0.5)';
+    ctx.lineWidth=1.5;
+    ctx.setLineDash([5,7]);
+    ctx.beginPath();
+    ctx.moveTo(x,y);
+    for(let s=0;s<300;s++){
+      x+=vx; y+=vy;
+      const wh=field.bulletHit(x,y);
+      if(wh){
+        ctx.lineTo(x,y); ctx.stroke();
+        if(bounces>0){
+          const dot=vx*wh.nx+vy*wh.ny;
+          vx-=2*dot*wh.nx; vy-=2*dot*wh.ny; bounces--;
+          if(wh.nx) x+=wh.nx*BULLET_R*1.5;
+          if(wh.ny) y+=wh.ny*BULLET_R*1.5;
+          ctx.beginPath(); ctx.moveTo(x,y);
+        } else break;
+      }
+      if(x<FX||x>FX+FW||y<FY||y>FY+FH) break;
+    }
+    ctx.lineTo(x,y); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.beginPath(); ctx.arc(x,y,4,0,PI2);
+    ctx.fillStyle='rgba(0,207,255,0.55)'; ctx.fill();
+    ctx.restore();
+  }
   draw(ctx){
     if(this.dead) return;
+    this.drawGuide(ctx);
     this.drawTracks(ctx); this.drawBody(ctx,this.col);
     ctx.save(); ctx.fillStyle='#FFF'; ctx.font='bold 9px Arial';
     ctx.textAlign='center'; ctx.fillText('P1',this.x,this.y+3);
