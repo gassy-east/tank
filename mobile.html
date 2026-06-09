@@ -20,167 +20,148 @@ html, body {
   position: fixed;
   top: 0; left: 0;
   width: 100%; height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  display: flex; justify-content: center; align-items: center;
 }
-canvas {
-  display: block;
-  image-rendering: pixelated;
-  /* scaled via JS transform */
-}
-/* ── HUD buttons overlay ── */
-#hud-btns {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  pointer-events: none;
+canvas { display: block; image-rendering: pixelated; }
+
+/* ── HUD buttons ── */
+#btn-pause, #btn-customize {
+  position: fixed; top: 10px;
+  width: 44px; height: 44px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  pointer-events: auto; cursor: pointer;
+  -webkit-tap-highlight-color: transparent; z-index: 10;
 }
 #btn-pause {
-  position: absolute;
-  top: 10px; right: 12px;
-  width: 44px; height: 44px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.12);
-  border: 2px solid rgba(255,255,255,0.3);
-  color: #fff;
-  font-size: 18px;
-  display: flex; align-items: center; justify-content: center;
-  pointer-events: auto;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  z-index: 10;
+  right: 12px;
+  background: rgba(255,255,255,0.12); border: 2px solid rgba(255,255,255,0.3);
+  color: #fff; font-size: 18px;
 }
-/* ── Virtual joysticks ── */
-#sticks {
-  position: fixed;
-  bottom: 0; left: 0;
-  width: 100%; height: 200px;
-  pointer-events: none;
-  z-index: 5;
+#btn-customize {
+  right: 64px;
+  background: rgba(255,255,255,0.07); border: 2px solid rgba(255,255,255,0.18);
+  color: rgba(255,255,255,0.55); font-size: 17px;
 }
-.stick-zone {
-  position: absolute;
-  bottom: 0;
-  width: 40%;
-  height: 200px;
-  pointer-events: auto;
-  -webkit-tap-highlight-color: transparent;
-}
-#stick-left  { left: 0; }
-#stick-right { right: 0; }
 
+/* ── Touch zones (invisible, large areas) ── */
+#zone-left {
+  position: fixed; left: 0; bottom: 0;
+  width: 50%; height: 44%;
+  z-index: 4; pointer-events: auto; touch-action: none;
+}
+#zone-right {
+  position: fixed; right: 0; bottom: 0;
+  width: 50%; height: 44%;
+  z-index: 4; pointer-events: auto; touch-action: none;
+}
+
+/* ── Stick bases (position set by Layout.apply) ── */
 .stick-base {
-  position: absolute;
-  bottom: 50px;
-  width: 100px; height: 100px;
+  position: fixed;
   border-radius: 50%;
-  background: rgba(255,255,255,0.08);
-  border: 2px solid rgba(255,255,255,0.2);
-  pointer-events: none;
+  background: rgba(255,255,255,0.08); border: 2px solid rgba(255,255,255,0.2);
+  pointer-events: none; z-index: 5;
 }
-#base-left  { left: 50%; transform: translateX(-50%); }
-#base-right { left: 50%; transform: translateX(-50%); }
-
 .stick-knob {
   position: absolute;
-  width: 44px; height: 44px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.35);
-  border: 2px solid rgba(255,255,255,0.6);
-  top: 50%; left: 50%;
-  transform: translate(-50%,-50%);
+  width: 44px; height: 44px; border-radius: 50%;
+  background: rgba(255,255,255,0.35); border: 2px solid rgba(255,255,255,0.6);
+  top: 50%; left: 50%; transform: translate(-50%,-50%);
   pointer-events: none;
-  transition: opacity 0.1s;
 }
 
-/* ── Center controls (fire + mine) ── */
-#center-controls {
-  position: fixed;
-  bottom: 16px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  z-index: 6;
-  pointer-events: none;
+/* ── Action buttons (position set by Layout.apply) ── */
+#btn-fire, #btn-mine {
+  position: fixed; border-radius: 50%; font-weight: bold;
+  display: flex; align-items: center; justify-content: center;
+  pointer-events: auto; cursor: pointer;
+  -webkit-tap-highlight-color: transparent; z-index: 6;
 }
 #btn-fire {
   width: 72px; height: 72px;
-  border-radius: 50%;
-  background: rgba(0,200,255,0.2);
-  border: 2px solid rgba(0,200,255,0.7);
-  color: #00CFFF;
-  font-size: 13px;
-  font-weight: bold;
-  display: flex; align-items: center; justify-content: center;
-  pointer-events: auto;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
+  background: rgba(0,200,255,0.2); border: 2px solid rgba(0,200,255,0.7);
+  color: #00CFFF; font-size: 13px;
 }
 #btn-fire:active { background: rgba(0,200,255,0.45); }
 #btn-mine {
   width: 48px; height: 48px;
-  border-radius: 50%;
-  background: rgba(255,100,0,0.2);
-  border: 2px solid rgba(255,100,0,0.6);
-  color: #FF6600;
-  font-size: 12px;
-  font-weight: bold;
-  display: flex; align-items: center; justify-content: center;
-  pointer-events: auto;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
+  background: rgba(255,100,0,0.2); border: 2px solid rgba(255,100,0,0.6);
+  color: #FF6600; font-size: 12px;
 }
 #btn-mine:active { background: rgba(255,100,0,0.45); }
 
-/* ── Landscape: right-side grouping ── */
-@media (orientation: landscape) {
-  #sticks { height: 155px; }
-  .stick-zone { height: 155px; }
-
-  /* shrink left zone slightly */
-  #stick-left { width: 36%; }
-
-  /* right zone stays 40% but aim base shifts left to leave room for buttons */
-  #stick-right { width: 40%; }
-  #base-right  { left: 38%; }   /* shift base leftward; transform stays -50% */
-
-  /* move center controls from center to far-right */
-  #center-controls {
-    left: auto;
-    transform: none;
-    right: 14px;
-    bottom: 12px;
-    gap: 10px;
-  }
+/* ── Customize overlay ── */
+#customize-overlay {
+  position: fixed; inset: 0; z-index: 20;
+  display: none; flex-direction: column; pointer-events: none;
 }
+#customize-toolbar {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 14px; background: rgba(0,0,0,0.8);
+  pointer-events: auto;
+}
+#customize-hint { flex:1; color:#aaa; font-size:13px; }
+#btn-cust-reset, #btn-cust-done {
+  padding: 6px 14px; border-radius: 8px; border: none;
+  font-size: 14px; font-weight: bold; cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+#btn-cust-reset { background: rgba(255,255,255,0.15); color: #aaa; }
+#btn-cust-done  { background: #00CFFF; color: #000; }
+#size-ctrls {
+  display: flex; gap: 16px; padding: 8px 14px;
+  background: rgba(0,0,0,0.65); pointer-events: auto; flex-wrap: wrap;
+}
+.size-ctrl { display:flex; align-items:center; gap:6px; color:#ccc; font-size:13px; }
+.sz-btn {
+  width: 32px; height: 32px; border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.12);
+  color: #fff; font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; -webkit-tap-highlight-color: transparent;
+}
+.customize-item {
+  pointer-events: auto !important;
+  outline: 2px dashed rgba(255,215,0,0.85); outline-offset: 5px;
+  z-index: 21 !important;
+}
+.drag-active { outline-color: #FFD700; outline-width: 3px; opacity: 0.8; }
 </style>
 </head>
 <body>
-<div id="wrapper">
-  <canvas id="c"></canvas>
-</div>
-<div id="hud-btns">
-  <div id="btn-pause">⏸</div>
-</div>
-<div id="sticks">
-  <div id="stick-left" class="stick-zone">
-    <div id="base-left" class="stick-base">
-      <div id="knob-left" class="stick-knob"></div>
+<div id="wrapper"><canvas id="c"></canvas></div>
+<div id="btn-pause">⏸</div>
+<div id="btn-customize">⚙</div>
+<div id="zone-left"></div>
+<div id="zone-right"></div>
+<div id="base-left"  class="stick-base"><div id="knob-left"  class="stick-knob"></div></div>
+<div id="base-right" class="stick-base"><div id="knob-right" class="stick-knob"></div></div>
+<div id="btn-fire">発射</div>
+<div id="btn-mine">地雷</div>
+<div id="customize-overlay">
+  <div id="customize-toolbar">
+    <span id="customize-hint">ドラッグで移動 / ± でサイズ変更</span>
+    <button id="btn-cust-reset">リセット</button>
+    <button id="btn-cust-done">完了</button>
+  </div>
+  <div id="size-ctrls">
+    <div class="size-ctrl"><span>移動</span>
+      <button class="sz-btn" data-for="base-left"  data-d="-8">−</button>
+      <button class="sz-btn" data-for="base-left"  data-d="8">＋</button>
+    </div>
+    <div class="size-ctrl"><span>方向</span>
+      <button class="sz-btn" data-for="base-right" data-d="-8">−</button>
+      <button class="sz-btn" data-for="base-right" data-d="8">＋</button>
+    </div>
+    <div class="size-ctrl"><span>発射</span>
+      <button class="sz-btn" data-for="btn-fire"   data-d="-8">−</button>
+      <button class="sz-btn" data-for="btn-fire"   data-d="8">＋</button>
+    </div>
+    <div class="size-ctrl"><span>地雷</span>
+      <button class="sz-btn" data-for="btn-mine"   data-d="-8">−</button>
+      <button class="sz-btn" data-for="btn-mine"   data-d="8">＋</button>
     </div>
   </div>
-  <div id="stick-right" class="stick-zone">
-    <div id="base-right" class="stick-base">
-      <div id="knob-right" class="stick-knob"></div>
-    </div>
-  </div>
-</div>
-<div id="center-controls">
-  <div id="btn-mine">地雷</div>
-  <div id="btn-fire">発射</div>
 </div>
 
 <script>
@@ -238,7 +219,7 @@ const Touch = {
     // fire is held state — not reset here
   },
 
-  initStick(side, zoneEl, knobEl, baseEl){
+  initStick(side, zoneEl, knobEl, baseEl, proxRadius){
     const self = this;
     const data = side === 'left' ? self.left : self.right;
 
@@ -247,6 +228,12 @@ const Touch = {
       Sfx.resume();
       if(data.id !== null) return;
       const t = e.changedTouches[0];
+      // proximity check: right stick only activates near the visual base
+      if(proxRadius){
+        const br=baseEl.getBoundingClientRect();
+        const cx=br.left+br.width/2, cy=br.top+br.height/2;
+        if(Math.hypot(t.clientX-cx, t.clientY-cy)>proxRadius) return;
+      }
       data.id = t.identifier;
       data.active = true;
       if(side === 'right') data.moving = false;
@@ -304,6 +291,100 @@ const Touch = {
       }
     }
   },
+};
+
+// ─── LAYOUT (localStorage) ───────────────────────────────────
+const Layout = {
+  DEFAULTS(){
+    const W=window.innerWidth;
+    return {
+      'base-left':  { bottom:55, left:40,    size:100 },
+      'base-right': { bottom:55, left:W-140, size:100 },
+      'btn-fire':   { bottom:25, left:W-86,  size:72  },
+      'btn-mine':   { bottom:107,left:W-68,  size:48  },
+    };
+  },
+  cfg:null,
+  load(){
+    try{ const s=localStorage.getItem('tankLayout_v2');
+      this.cfg=s?JSON.parse(s):this.DEFAULTS();
+    }catch{ this.cfg=this.DEFAULTS(); }
+  },
+  save(){ localStorage.setItem('tankLayout_v2',JSON.stringify(this.cfg)); },
+  reset(){ this.cfg=this.DEFAULTS(); this.apply(); },
+  apply(){
+    const W=window.innerWidth, H=window.innerHeight;
+    for(const [id,c] of Object.entries(this.cfg)){
+      const el=document.getElementById(id); if(!el) continue;
+      const sz=c.size;
+      el.style.width=sz+'px'; el.style.height=sz+'px';
+      el.style.left=clamp(c.left,0,W-sz)+'px'; el.style.right='';
+      el.style.bottom=clamp(c.bottom,0,H-sz)+'px'; el.style.top='';
+    }
+  }
+};
+
+// ─── CUSTOMIZE MODE ──────────────────────────────────────────
+const Customize = {
+  active:false, _drag:null,
+
+  enter(){
+    this.active=true;
+    if(G.state===ST.PLAY) G.state=ST.PAUSE;
+    document.getElementById('customize-overlay').style.display='flex';
+    ['base-left','base-right','btn-fire','btn-mine'].forEach(id=>{
+      document.getElementById(id).classList.add('customize-item');
+    });
+  },
+  exit(){
+    this.active=false;
+    document.getElementById('customize-overlay').style.display='none';
+    ['base-left','base-right','btn-fire','btn-mine'].forEach(id=>{
+      const el=document.getElementById(id);
+      el.classList.remove('customize-item','drag-active');
+    });
+    Layout.save();
+  },
+
+  initDraggable(id){
+    const el=document.getElementById(id);
+    let sTX,sTY,sLeft,sBottom;
+    el.addEventListener('touchstart',e=>{
+      if(!this.active) return;
+      e.preventDefault(); e.stopPropagation();
+      const t=e.touches[0];
+      sTX=t.clientX; sTY=t.clientY;
+      sLeft=parseFloat(el.style.left)||0;
+      sBottom=parseFloat(el.style.bottom)||0;
+      el.classList.add('drag-active'); this._drag=id;
+    },{passive:false});
+    el.addEventListener('touchmove',e=>{
+      if(!this.active||this._drag!==id) return;
+      e.preventDefault(); e.stopPropagation();
+      const t=e.touches[0], sz=el.offsetWidth;
+      const W=window.innerWidth, H=window.innerHeight;
+      const nl=clamp(sLeft+(t.clientX-sTX),0,W-sz);
+      const nb=clamp(sBottom-(t.clientY-sTY),0,H-sz);
+      el.style.left=nl+'px'; el.style.bottom=nb+'px';
+      Layout.cfg[id].left=nl; Layout.cfg[id].bottom=nb;
+    },{passive:false});
+    const endFn=()=>{ if(this._drag===id){el.classList.remove('drag-active');this._drag=null;} };
+    el.addEventListener('touchend',endFn);
+    el.addEventListener('touchcancel',endFn);
+  },
+
+  resize(id,delta){
+    const el=document.getElementById(id);
+    const c=Layout.cfg[id];
+    c.size=clamp((c.size||72)+delta,36,160);
+    el.style.width=c.size+'px'; el.style.height=c.size+'px';
+    if(id==='base-left'||id==='base-right'){
+      const knob=el.querySelector('.stick-knob');
+      if(knob){ const ks=Math.round(c.size*0.44); knob.style.width=ks+'px'; knob.style.height=ks+'px'; }
+    } else {
+      el.style.fontSize=Math.round(c.size*0.18)+'px';
+    }
+  }
 };
 
 // ─── AUDIO ───────────────────────────────────────────────────
@@ -1031,51 +1112,84 @@ const G = {
 
   _initUI(){
     // pause button
-    document.getElementById('btn-pause').addEventListener('touchstart', e=>{
+    document.getElementById('btn-pause').addEventListener('touchstart',e=>{
       e.preventDefault(); Sfx.resume();
-      if(this.state===ST.PLAY)   this.state=ST.PAUSE;
-      else if(this.state===ST.PAUSE) this.state=ST.PLAY;
-    }, {passive:false});
+      if(Customize.active) return;
+      if(this.state===ST.PLAY)        this.state=ST.PAUSE;
+      else if(this.state===ST.PAUSE)  this.state=ST.PLAY;
+    },{passive:false});
+
+    // customize button (always accessible; pauses game automatically)
+    document.getElementById('btn-customize').addEventListener('touchstart',e=>{
+      e.preventDefault(); Sfx.resume();
+      if(!Customize.active) Customize.enter();
+    },{passive:false});
+
+    // customize toolbar: done / reset
+    document.getElementById('btn-cust-done').addEventListener('touchstart',e=>{
+      e.preventDefault(); Customize.exit();
+    },{passive:false});
+    document.getElementById('btn-cust-reset').addEventListener('touchstart',e=>{
+      e.preventDefault(); Layout.reset();
+    },{passive:false});
+
+    // size control ± buttons
+    document.querySelectorAll('.sz-btn').forEach(btn=>{
+      btn.addEventListener('touchstart',e=>{
+        e.preventDefault();
+        Customize.resize(btn.dataset.for, parseInt(btn.dataset.d));
+      },{passive:false});
+    });
 
     // fire button (held = continuous shoot)
-    const btnFire = document.getElementById('btn-fire');
-    btnFire.addEventListener('touchstart', e=>{
+    const btnFire=document.getElementById('btn-fire');
+    btnFire.addEventListener('touchstart',e=>{
       e.preventDefault(); Sfx.resume();
+      if(Customize.active) return;
       Touch.fire=true;
-    }, {passive:false});
-    btnFire.addEventListener('touchend',   e=>{ e.preventDefault(); Touch.fire=false; }, {passive:false});
-    btnFire.addEventListener('touchcancel',e=>{ e.preventDefault(); Touch.fire=false; }, {passive:false});
+    },{passive:false});
+    btnFire.addEventListener('touchend',   e=>{ e.preventDefault(); Touch.fire=false; },{passive:false});
+    btnFire.addEventListener('touchcancel',e=>{ e.preventDefault(); Touch.fire=false; },{passive:false});
 
     // mine button
-    document.getElementById('btn-mine').addEventListener('touchstart', e=>{
+    document.getElementById('btn-mine').addEventListener('touchstart',e=>{
       e.preventDefault(); Sfx.resume();
+      if(Customize.active) return;
       Touch.mineTap=true;
-    }, {passive:false});
+    },{passive:false});
 
-    // title tap — tap canvas to start
-    this.cv.addEventListener('touchstart', e=>{
+    // title / game-over: tap canvas to start
+    this.cv.addEventListener('touchstart',e=>{
       e.preventDefault(); Sfx.resume();
-      if(this.state===ST.TITLE)  Touch.titleTap=true;
-      if(this.state===ST.OVER)   Touch.titleTap=true;
-    }, {passive:false});
+      if(this.state===ST.TITLE) Touch.titleTap=true;
+      if(this.state===ST.OVER)  Touch.titleTap=true;
+    },{passive:false});
 
     // joystick setup
-    Touch.initStick(
-      'left',
-      document.getElementById('stick-left'),
+    // left: floating (any touch in zone), right: proximity only (within 80px of base)
+    Touch.initStick('left',
+      document.getElementById('zone-left'),
       document.getElementById('knob-left'),
-      document.getElementById('base-left')
+      document.getElementById('base-left'),
+      null
     );
-    Touch.initStick(
-      'right',
-      document.getElementById('stick-right'),
+    Touch.initStick('right',
+      document.getElementById('zone-right'),
       document.getElementById('knob-right'),
-      document.getElementById('base-right')
+      document.getElementById('base-right'),
+      80
     );
+
+    // make each control draggable in customize mode
+    ['base-left','base-right','btn-fire','btn-mine'].forEach(id=>Customize.initDraggable(id));
+
+    // load + apply saved (or default) layout
+    Layout.load();
+    Layout.apply();
 
     // responsive scaling
     this._resize();
-    window.addEventListener('resize', ()=>this._resize());
+    window.addEventListener('resize',()=>this._resize());
   },
 
   _resize(){
